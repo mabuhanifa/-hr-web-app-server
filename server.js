@@ -6,6 +6,15 @@ app.use(cors());
 
 const port = process.env.PORT || 5000;
 
-app.listen(() => {
+app.get("/users", (req, res) => {
+  res.send(`req.body`);
+});
+
+app.post("/users", (req, res) => {
+  console.log(req.body);
+  res.send(`req.body`);
+});
+
+app.listen(port, () => {
   console.log(`Application running at ${port}`);
 });
