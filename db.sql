@@ -8,11 +8,13 @@ CREATE TABLE users (
 
 CREATE TABLE employee (
     id SERIAL PRIMARY KEY,
-    name TEXT NOT NULL,
-    email TEXT NOT NULL UNIQUE,
-    img TEXT,
-    department TEXT,
-    leaveStatus TEXT,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    img VARCHAR(200),
+    department VARCHAR(50),
+    leaveStatus VARCHAR(100),
     isAdmin BOOLEAN NOT NULL DEFAULT FALSE,
     passReset BOOLEAN NOT NULL DEFAULT FALSE
 );
+
+CREATE DATABASE employee;
