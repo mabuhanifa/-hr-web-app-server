@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+/* ---------------------Express app-------------------- */
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -15,6 +16,7 @@ app.post("/users", (req, res) => {
   res.send(`req.body`);
 });
 
+/* ---------------------app listening on port-------------------- */
 app.listen(port, () => {
   console.log(`Application running at ${port}`);
 });
