@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const pool = require("./db");
-
+const nodemailer = require("nodemailer");
 /* ---------------------Express app-------------------- */
 const app = express();
 app.use(express.json());
@@ -41,7 +41,6 @@ app.post("/login/:email", async (req, res) => {
         data: user.rows[0],
         login: isLogin,
       });
-
     } else {
       res.status(201).json({
         message: `login failed`,
@@ -51,6 +50,42 @@ app.post("/login/:email", async (req, res) => {
   } catch (error) {
     console.log(error);
   }
+});
+
+app.post("/signup", async (req, res) => {
+  let testAccount = await nodemailer.createTestAccount();
+
+  // create reusable transporter object using the default SMTP transport
+  let transporter = nodemailer.createTransport({
+    host: "smtp.ethereal.email",
+    port: 587,
+    secure: false, // true for 465, false for other ports
+    auth: {
+      user: testAccount.user, // generated ethereal user
+      pass: testAccount.pass, // generated ethereal password
+    },
+  });
+
+  let message = {
+    from: '"Fred Foo 👻" <foo@example.com>', // sender address
+    to: "bar@example.com, baz@example.com", // list of receivers
+    subject: "Hello ✔", // Subject line
+    text: "Successfully Register with us.", // plain text body
+    html: "<b>Successfully Register with us.</b>", // html body
+  };
+
+  transporter
+    .sendMail(message)
+    .then((info) => {
+      return res.status(201).json({
+        msg: "you should receive an email",
+        info: info.messageId,
+        preview: nodemailer.getTestMessageUrl(info),
+      });
+    })
+    .catch((error) => {
+      return res.status(500).json({ error });
+    });
 });
 
 app.post("/users", async (req, res) => {
@@ -69,7 +104,7 @@ app.post("/users", async (req, res) => {
       "INSERT INTO employee (name, img, email, department, leaveStatus, isAdmin, passReset, password) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *",
       [name, img, email, department, leaveStatus, isAdmin, passReset, password]
     );
-
+    
     res.status(201).json({
       message: `Successfully created a new employee with ${name} and ${email}`,
       data: newEmployee.rows,
