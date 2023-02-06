@@ -6,10 +6,23 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-const port = process.env.PORT || 5000;
+const port =  5000;
 
-app.get("/users", (req, res) => {
-  res.send(`req.body`);
+app.get("/users/:email", async (req, res) => {
+  try {
+    const { email } = req.params;
+    console.log(email);
+    const user = await pool.query(
+      "SELECT * FROM employee WHERE email = $1",
+      [email]
+    );
+    res.status(201).json({
+      message: `success`,
+      data: user.rows,
+    });
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 app.post("/users", async (req, res) => {
