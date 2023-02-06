@@ -29,18 +29,19 @@ app.post("/login/:email", async (req, res) => {
   try {
     const { email } = req.params;
     const { password } = req.body;
-    console.log(email);
     const user = await pool.query("SELECT * FROM employee WHERE email = $1", [
       email,
     ]);
 
     const isLogin = user.rows[0].password === password;
+
     if (isLogin) {
       res.status(201).json({
         message: `successfully logged in`,
         data: user.rows[0],
         login: isLogin,
       });
+
     } else {
       res.status(201).json({
         message: `login failed`,
