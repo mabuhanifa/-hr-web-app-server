@@ -6,20 +6,46 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-const port =  5000;
+const port = 5000;
 
 app.get("/users/:email", async (req, res) => {
   try {
     const { email } = req.params;
     console.log(email);
-    const user = await pool.query(
-      "SELECT * FROM employee WHERE email = $1",
-      [email]
-    );
+    const user = await pool.query("SELECT * FROM employee WHERE email = $1", [
+      email,
+    ]);
     res.status(201).json({
       message: `success`,
       data: user.rows,
     });
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+app.post("/login/:email", async (req, res) => {
+  try {
+    const { email } = req.params;
+    const { password } = req.body;
+    console.log(email);
+    const user = await pool.query("SELECT * FROM employee WHERE email = $1", [
+      email,
+    ]);
+
+    const isLogin = user.rows[0].password === password;
+    if (isLogin) {
+      res.status(201).json({
+        message: `successfully logged in`,
+        data: user.rows[0],
+        login: isLogin,
+      });
+    } else {
+      res.status(201).json({
+        message: `login failed`,
+        login: isLogin,
+      });
+    }
   } catch (error) {
     console.log(error);
   }
