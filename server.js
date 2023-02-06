@@ -53,25 +53,23 @@ app.post("/login/:email", async (req, res) => {
 });
 
 app.post("/signup", async (req, res) => {
-  let testAccount = await nodemailer.createTestAccount();
-
   // create reusable transporter object using the default SMTP transport
   let transporter = nodemailer.createTransport({
-    host: "smtp.ethereal.email",
-    port: 587,
-    secure: false, // true for 465, false for other ports
+    service: "gmail", // true for 465, false for other ports
     auth: {
-      user: testAccount.user, // generated ethereal user
-      pass: testAccount.pass, // generated ethereal password
+      user: "moh.abuhanifa@gmail.com",
+      pass: process.env.GMAIL_PASS, // generated ethereal password
     },
+    port: 465,
+    host: "smtp.gmail.com",
   });
 
   let message = {
-    from: '"Fred Foo 👻" <foo@example.com>', // sender address
-    to: "bar@example.com, baz@example.com", // list of receivers
-    subject: "Hello ✔", // Subject line
-    text: "Successfully Register with us.", // plain text body
-    html: "<b>Successfully Register with us.</b>", // html body
+    from: "moh.abuhanifa@gmail.com",
+    to: "muham.abuhanifa@gmail.com", // list of receivers
+    subject: "Hello Muhammed", // Subject line
+    text: "Hello world?", // plain text body
+    html: "<b>Hello world?</b>", // html body
   };
 
   transporter
@@ -104,7 +102,7 @@ app.post("/users", async (req, res) => {
       "INSERT INTO employee (name, img, email, department, leaveStatus, isAdmin, passReset, password) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *",
       [name, img, email, department, leaveStatus, isAdmin, passReset, password]
     );
-    
+
     res.status(201).json({
       message: `Successfully created a new employee with ${name} and ${email}`,
       data: newEmployee.rows,
