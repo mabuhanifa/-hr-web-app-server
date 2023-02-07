@@ -7,7 +7,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 require("dotenv").config();
-const port = 5000;
+const port = process.env.PORT || 5000;
 
 let transporter = nodemailer.createTransport({
   service: "gmail", // true for 465, false for other ports
