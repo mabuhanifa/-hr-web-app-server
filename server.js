@@ -9,6 +9,16 @@ app.use(cors());
 require("dotenv").config();
 const port = 5000;
 
+let transporter = nodemailer.createTransport({
+  service: "gmail", // true for 465, false for other ports
+  auth: {
+    user: "moh.abuhanifa@gmail.com",
+    pass: process.env.GMAIL_PASS, // generated ethereal password
+  },
+  port: 465,
+  host: "smtp.gmail.com",
+});
+
 app.get("/users/:email", async (req, res) => {
   try {
     const { email } = req.params;
@@ -54,36 +64,6 @@ app.post("/login/:email", async (req, res) => {
 
 app.post("/signup", async (req, res) => {
   // create reusable transporter object using the default SMTP transport
-  let transporter = nodemailer.createTransport({
-    service: "gmail", // true for 465, false for other ports
-    auth: {
-      user: "moh.abuhanifa@gmail.com",
-      pass: process.env.GMAIL_PASS, // generated ethereal password
-    },
-    port: 465,
-    host: "smtp.gmail.com",
-  });
-
-  let message = {
-    from: "moh.abuhanifa@gmail.com",
-    to: "muham.abuhanifa@gmail.com", // list of receivers
-    subject: "Hello Muhammed", // Subject line
-    text: "Hello world?", // plain text body
-    html: "<b>Hello world?</b>", // html body
-  };
-
-  transporter
-    .sendMail(message)
-    .then((info) => {
-      return res.status(201).json({
-        msg: "you should receive an email",
-        info: info.messageId,
-        preview: nodemailer.getTestMessageUrl(info),
-      });
-    })
-    .catch((error) => {
-      return res.status(500).json({ error });
-    });
 });
 
 app.post("/users", async (req, res) => {
@@ -98,15 +78,31 @@ app.post("/users", async (req, res) => {
       isAdmin,
       passReset,
     } = req.body;
+
     const newEmployee = await pool.query(
       "INSERT INTO employee (name, img, email, department, leaveStatus, isAdmin, passReset, password) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *",
       [name, img, email, department, leaveStatus, isAdmin, passReset, password]
     );
+    let message = {
+      from: "moh.abuhanifa@gmail.com",
+      to: email, // list of receivers
+      subject: "Your Leave Application login credentials", // Subject line
+      text: `Your email is ${email} and password is ${password}. Reset your password to make a leave application`, // plain text body
+    };
 
-    res.status(201).json({
-      message: `Successfully created a new employee with ${name} and ${email}`,
-      data: newEmployee.rows,
-    });
+    transporter
+      .sendMail(message)
+      .then((info) => {
+        return res.status(201).json({
+          info: info.messageId,
+          preview: nodemailer.getTestMessageUrl(info),
+          message: `Successfully created a new employee with ${name} and ${email}`,
+          data: newEmployee.rows,
+        });
+      })
+      .catch((error) => {
+        return res.status(500).json({ error });
+      });
   } catch (error) {
     console.log(error);
   }
