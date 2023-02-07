@@ -63,7 +63,7 @@ app.post("/login/:email", async (req, res) => {
       email,
     ]);
 
-    const isLogin = user.rows[0].password === password;
+    const isLogin = user.rows[0]?.password === password;
 
     if (isLogin) {
       res.status(201).json({

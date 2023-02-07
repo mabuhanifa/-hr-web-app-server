@@ -13,9 +13,9 @@ CREATE TABLE employee (
     password VARCHAR(100) NOT NULL,
     img VARCHAR(200),
     department VARCHAR(50),
-    leaveStatus VARCHAR(100),
-    isAdmin BOOLEAN NOT NULL DEFAULT FALSE,
-    passReset BOOLEAN NOT NULL DEFAULT FALSE
+    leavestatus VARCHAR(100),
+    isadmin BOOLEAN NOT NULL DEFAULT FALSE,
+    passreset BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE DATABASE employee;
